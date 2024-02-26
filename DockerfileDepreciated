@@ -1,0 +1,46 @@
+# Use Ubuntu 18.04 as the base image
+FROM ubuntu:18.04
+
+ENV DEBIAN_FRONTEND=noninteractive TZ=Asia/Kolkata 
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive
+
+# Update package lists and install required packages
+# RUN apt-get install -y \
+#     php7.2 \
+#     php7.2-mysql \
+#     mysql-server 
+
+RUN apt-get install -y \
+    build-essential \
+    wget \
+    libpcre3-dev \
+    libssl-dev \
+    zlib1g-dev
+
+RUN wget https://www.zlib.net/fossils/zlib-1.2.11.tar.gz
+RUN tar -xvf zlib-1.2.11.tar.gz
+RUN cd zlib-1.2.11/ && ./configure --prefix=/usr/local && make && make install
+
+
+RUN  wget https://archive.apache.org/dist/httpd/httpd-2.2.32.tar.gz
+RUN tar -xvf httpd-2.2.32.tar.gz
+RUN cd httpd-2.2.32/ && \
+    ./configure --prefix=/usr/local/apache2 --enable-mods-shared=all --enable-deflate --enable-proxy --enable-proxy-balancer --enable-proxy-http && \
+    make && \
+    make install
+
+
+# Clone bWAPP repository
+COPY bWAPP/ /usr/local/apache2/htdocs
+RUN rm /usr/local/apache2/htdocs/index.html
+EXPOSE 80
+COPY mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
+
+
+# Start MySQL and Apache in the foreground
+# CMD service mysql start && /usr/local/apache2/bin/apachectl start && /bin/bash
+CMD  /usr/local/apache2/bin/apachectl start && /bin/bash
+
+# DEV
+# CMD /bin/bash
