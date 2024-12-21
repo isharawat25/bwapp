@@ -1,4 +1,3 @@
-# CYBERFORGE ACADEMY ASSIGNMENT 
 
 ## Introduction/Research
 
